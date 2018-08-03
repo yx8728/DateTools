@@ -813,20 +813,30 @@ static NSCalendar *implicitCalendar = nil;
 
 + (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString timeZone:(NSTimeZone *)timeZone {
 
-	static NSDateFormatter *parser = nil;
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-	    parser = [[NSDateFormatter alloc] init];
-	});
+    static NSDateFormatter *parser = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        parser = [[NSDateFormatter alloc] init];
+    });
     
-	parser.dateStyle = NSDateFormatterNoStyle;
-	parser.timeStyle = NSDateFormatterNoStyle;
-	parser.timeZone = timeZone;
-	parser.dateFormat = formatString;
-
-    NSLog(@"%@", formatString);
+    // 加入一个同步队列让多线程排队，在多线程冲突的时候会稍微影响点性能
+    static dispatch_queue_t parseQueue;
+    static dispatch_once_t queueOnceToken;
+    dispatch_once(&queueOnceToken, ^{
+        parseQueue = dispatch_queue_create([@"DateToolsParseQueue" UTF8String], NULL);
+    });
     
-	return [parser dateFromString:dateString];
+    __block NSDate *date = nil;
+    
+    dispatch_sync(parseQueue, ^{
+        parser.dateStyle = NSDateFormatterNoStyle;
+        parser.timeStyle = NSDateFormatterNoStyle;
+        parser.timeZone = timeZone;
+        parser.dateFormat = formatString;
+        date = [parser dateFromString:dateString];
+    });
+    
+    return date;
 }
 
 
@@ -1626,11 +1636,23 @@ static NSCalendar *implicitCalendar = nil;
     dispatch_once(&onceToken, ^{
         formatter = [[NSDateFormatter alloc] init];
     });
+    
+    // 加入一个同步队列让多线程排队，在多线程冲突的时候会稍微影响点性能
+    static dispatch_queue_t formatterStyleQueue;
+    static dispatch_once_t formatterStyleOnceToken;
+    dispatch_once(&formatterStyleOnceToken, ^{
+        formatterStyleQueue = dispatch_queue_create([@"DateToolsFormatterStyleQueue" UTF8String], NULL);
+    });
 
-    [formatter setDateStyle:style];
-    [formatter setTimeZone:timeZone];
-    [formatter setLocale:locale];
-    return [formatter stringFromDate:self];
+    __block NSString *result = nil;
+    dispatch_sync(formatterStyleQueue, ^{
+        [formatter setDateStyle:style];
+        [formatter setTimeZone:timeZone];
+        [formatter setLocale:locale];
+        result = [formatter stringFromDate:self];
+    });
+    
+    return result;
 }
 
 #pragma mark Formatted With Format
@@ -1684,11 +1706,23 @@ static NSCalendar *implicitCalendar = nil;
     dispatch_once(&onceToken, ^{
         formatter = [[NSDateFormatter alloc] init];
     });
-
-    [formatter setDateFormat:format];
-    [formatter setTimeZone:timeZone];
-    [formatter setLocale:locale];
-    return [formatter stringFromDate:self];
+    
+    // 加入一个同步队列让多线程排队，在多线程冲突的时候会稍微影响点性能
+    static dispatch_queue_t formatterQueue;
+    static dispatch_once_t formatterOnceToken;
+    dispatch_once(&formatterOnceToken, ^{
+        formatterQueue = dispatch_queue_create([@"DateToolsFormatterQueue" UTF8String], NULL);
+    });
+    
+    __block NSString *result = nil;
+    dispatch_sync(formatterQueue, ^{
+        [formatter setDateFormat:format];
+        [formatter setTimeZone:timeZone];
+        [formatter setLocale:locale];
+        result = [formatter stringFromDate:self];
+    });
+    
+    return result;
 }
 
 #pragma mark - Helpers
