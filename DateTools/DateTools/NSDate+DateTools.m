@@ -818,12 +818,14 @@ static NSCalendar *implicitCalendar = nil;
 	dispatch_once(&onceToken, ^{
 	    parser = [[NSDateFormatter alloc] init];
 	});
-
+    
 	parser.dateStyle = NSDateFormatterNoStyle;
 	parser.timeStyle = NSDateFormatterNoStyle;
 	parser.timeZone = timeZone;
 	parser.dateFormat = formatString;
 
+    NSLog(@"%@", formatString);
+    
 	return [parser dateFromString:dateString];
 }
 
