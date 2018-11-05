@@ -829,6 +829,7 @@ static NSCalendar *implicitCalendar = nil;
     __block NSDate *date = nil;
     
     dispatch_sync(parseQueue, ^{
+        parser.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
         parser.dateStyle = NSDateFormatterNoStyle;
         parser.timeStyle = NSDateFormatterNoStyle;
         parser.timeZone = timeZone;
@@ -1649,6 +1650,7 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setDateStyle:style];
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
+        formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
         result = [formatter stringFromDate:self];
     });
     
@@ -1719,6 +1721,7 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setDateFormat:format];
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
+        formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
         result = [formatter stringFromDate:self];
     });
     
