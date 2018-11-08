@@ -811,7 +811,17 @@ static NSCalendar *implicitCalendar = nil;
 	return [self dateWithString:dateString formatString:formatString timeZone:[NSTimeZone systemTimeZone]];
 }
 
-+ (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString timeZone:(NSTimeZone *)timeZone {
++ (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString locale:(NSLocale *)locale
+{
+    return [self dateWithString:dateString formatString:formatString timeZone:[NSTimeZone systemTimeZone] locale:locale];
+}
+
++ (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString timeZone:(NSTimeZone *)timeZone
+{
+    return [self dateWithString:dateString formatString:formatString timeZone:timeZone locale:nil];
+}
+
++ (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString timeZone:(NSTimeZone *)timeZone locale:(NSLocale *)locale {
 
     static NSDateFormatter *parser = nil;
     static dispatch_once_t onceToken;
@@ -829,7 +839,12 @@ static NSCalendar *implicitCalendar = nil;
     __block NSDate *date = nil;
     
     dispatch_sync(parseQueue, ^{
-        parser.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+        if (locale) {
+            parser.locale = locale;
+        } else {
+            parser.locale = [NSLocale autoupdatingCurrentLocale];
+        }
+        
         parser.dateStyle = NSDateFormatterNoStyle;
         parser.timeStyle = NSDateFormatterNoStyle;
         parser.timeZone = timeZone;
@@ -1650,7 +1665,6 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setDateStyle:style];
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
-        formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
         result = [formatter stringFromDate:self];
     });
     
@@ -1721,7 +1735,6 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setDateFormat:format];
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
-        formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
         result = [formatter stringFromDate:self];
     });
     

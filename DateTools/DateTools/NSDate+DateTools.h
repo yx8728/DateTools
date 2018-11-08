@@ -96,6 +96,8 @@ NSLocalizedStringFromTableInBundle(key, @"DateTools", [NSBundle bundleWithPath:[
 + (NSDate *)dateWithYear:(NSInteger)year month:(NSInteger)month day:(NSInteger)day hour:(NSInteger)hour minute:(NSInteger)minute second:(NSInteger)second;
 + (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString;
 + (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString timeZone:(NSTimeZone *)timeZone;
++ (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString locale:(NSLocale *)locale;
++ (NSDate *)dateWithString:(NSString *)dateString formatString:(NSString *)formatString timeZone:(NSTimeZone *)timeZone locale:(NSLocale *)locale;
 
 
 #pragma mark - Date Editing
