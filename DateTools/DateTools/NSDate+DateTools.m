@@ -849,6 +849,7 @@ static NSCalendar *implicitCalendar = nil;
         parser.timeStyle = NSDateFormatterNoStyle;
         parser.timeZone = timeZone;
         parser.dateFormat = formatString;
+        parser.calendar = [NSCalendar autoupdatingCurrentCalendar];
         date = [parser dateFromString:dateString];
     });
     
@@ -1665,6 +1666,7 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setDateStyle:style];
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
+        formatter.calendar = [NSCalendar autoupdatingCurrentCalendar];
         result = [formatter stringFromDate:self];
     });
     
@@ -1735,6 +1737,7 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setDateFormat:format];
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
+        formatter.calendar = [NSCalendar autoupdatingCurrentCalendar];
         result = [formatter stringFromDate:self];
     });
     
