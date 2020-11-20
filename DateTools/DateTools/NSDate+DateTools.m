@@ -66,7 +66,7 @@ static NSCalendar *implicitCalendar = nil;
 @implementation NSDate (DateTools)
 
 + (void)load {
-    [self setDefaultCalendarIdentifier:NSCalendarIdentifierGregorian];
+    [self setDefaultCalendarIdentifier:nil];
 }
 
 #pragma mark - Time Ago
@@ -850,6 +850,12 @@ static NSCalendar *implicitCalendar = nil;
         parser.timeZone = timeZone;
         parser.dateFormat = formatString;
         parser.calendar = [NSCalendar autoupdatingCurrentCalendar];
+        if (@available(iOS 10.0, *)) {
+            if (locale) {
+                parser.calendar = [NSCalendar calendarWithIdentifier:locale.calendarIdentifier];
+            }
+        }
+        parser.calendar.locale = locale;
         date = [parser dateFromString:dateString];
     });
     
@@ -1667,6 +1673,11 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
         formatter.calendar = [NSCalendar autoupdatingCurrentCalendar];
+        if (@available(iOS 10.0, *)) {
+            if (locale) {
+                formatter.calendar = [NSCalendar calendarWithIdentifier:locale.calendarIdentifier];
+            }
+        }
         result = [formatter stringFromDate:self];
     });
     
@@ -1738,6 +1749,11 @@ static NSCalendar *implicitCalendar = nil;
         [formatter setTimeZone:timeZone];
         [formatter setLocale:locale];
         formatter.calendar = [NSCalendar autoupdatingCurrentCalendar];
+        if (@available(iOS 10.0, *)) {
+            if (locale) {
+                formatter.calendar = [NSCalendar calendarWithIdentifier:locale.calendarIdentifier];
+            }
+        }
         result = [formatter stringFromDate:self];
     });
     
@@ -1783,7 +1799,7 @@ static NSCalendar *implicitCalendar = nil;
  */
 + (void)setDefaultCalendarIdentifier:(NSString *)identifier {
     defaultCalendarIdentifier = [identifier copy];
-    implicitCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:defaultCalendarIdentifier ?: NSCalendarIdentifierGregorian];
+    implicitCalendar = defaultCalendarIdentifier ? [[NSCalendar alloc] initWithCalendarIdentifier:defaultCalendarIdentifier] : [NSCalendar autoupdatingCurrentCalendar];
 }
 
 /**
