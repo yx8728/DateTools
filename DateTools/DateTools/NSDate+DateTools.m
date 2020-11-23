@@ -855,7 +855,6 @@ static NSCalendar *implicitCalendar = nil;
                 parser.calendar = [NSCalendar calendarWithIdentifier:locale.calendarIdentifier];
             }
         }
-        parser.calendar.locale = locale;
         date = [parser dateFromString:dateString];
     });
     
